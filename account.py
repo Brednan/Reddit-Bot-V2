@@ -31,17 +31,17 @@ class Account(Session):
             'dest': 'https://www.reddit.com'
         }
 
-    def login_request(self, timeout):
-        proxy_scheme = {
+        self.proxy_scheme = {
             'http': 'http://geo.iproyal.com:12323',
             'https': 'http://geo.iproyal.com:12323'
         }
 
+    def login_request(self, timeout):
         attempt = 0
 
         while True:
             try:
-                login_req = self.post(url='https://www.reddit.com/login', data=self.login_payload, headers=self.headers_, cookies=self.cookies, timeout=timeout, proxies=proxy_scheme)
+                login_req = self.post(url='https://www.reddit.com/login', data=self.login_payload, headers=self.headers_, cookies=self.cookies, timeout=timeout, proxies=self.proxy_scheme)
 
             except requests.exceptions.ConnectionError:
                 if attempt >= 3:
@@ -66,3 +66,21 @@ class Account(Session):
 
                 except:
                     return self.FAILED_LOGIN
+
+    def downvote_request(self, id_):
+        payload = {
+            'id': id_,
+            'dir': '-1',
+            'api_type': 'json'
+        }
+
+        self.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0'})
+
+        self.get('https://www.reddit.com/r/AuthoritarianMasks/comments/vz2ne5/comment/ig7ezb0/?context=3')
+
+        options_ = self.options('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1')
+
+        x_reddit_session = options_.headers.get('x-reddit-session')
+        x_reddit_loid = options_.headers.get('x-reddit-loid')
+
+        #downvote_result = self.post('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1', proxies=self.proxy_scheme, data=payload)
