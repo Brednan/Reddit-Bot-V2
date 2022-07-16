@@ -43,6 +43,12 @@ class Account(Session):
             try:
                 login_req = self.post(url='https://www.reddit.com/login', data=self.login_payload, headers=self.headers_, cookies=self.cookies, timeout=timeout, proxies=self.proxy_scheme)
 
+                self.headers.update({
+                    'x-reddit-loid': login_req.cookies.get('loid')
+                })
+
+                print(login_req.headers)
+
             except requests.exceptions.ConnectionError:
                 if attempt >= 3:
                     return self.NO_CONNECTION
@@ -76,11 +82,15 @@ class Account(Session):
 
         self.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0'})
 
-        self.get('https://www.reddit.com/r/AuthoritarianMasks/comments/vz2ne5/comment/ig7ezb0/?context=3')
+        self.get('https://www.reddit.com/r/AuthoritarianMasks/comments/vz2ne5/comment/ig7ezb0/?context=3', proxies=self.proxy_scheme, timeout=5)
 
-        options_ = self.options('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1')
+        options_ = self.options('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1', timeout=5, proxies=self.proxy_scheme)
 
         x_reddit_session = options_.headers.get('x-reddit-session')
-        x_reddit_loid = options_.headers.get('x-reddit-loid')
 
-        #downvote_result = self.post('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1', proxies=self.proxy_scheme, data=payload)
+        self.headers.update({
+            'x-reddit-session': x_reddit_session
+        })
+
+        # downvote_result = self.post('https://oauth.reddit.com/api/vote?redditWebClient=desktop2x&app=desktop2x-client-production&raw_json=1&gilding_detail=1', proxies=self.proxy_scheme, data=payload, timeout=5)
+        # print(downvote_result.text)
