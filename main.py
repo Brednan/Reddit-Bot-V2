@@ -1,6 +1,11 @@
-from account import Account
+from bot import Bot
 
 
 if __name__ == '__main__':
-    test_acc = Account('pixel_pug_2391__', 'eAsSx_3l$4@2ndje123@')
-    print(test_acc.login_request(5))
+    try:
+        vote_type = input('Specify vote type | <U> for Upvote and <D> for Downvote: ')
+
+        bot = Bot('./burner_accounts.txt')
+
+    except FileNotFoundError:
+        print('\nUnable to locate accounts list!\n')
